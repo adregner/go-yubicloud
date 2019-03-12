@@ -287,8 +287,14 @@ func (y *YubiClient) Verify(req *VerifyRequest) (*VerifyResponse, error) {
 		signRequest(values, y.apiKey)
 	}
 
-	resp, err := http.PostForm(server, values)
+	uri, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
 
+	uri.RawQuery = values.Encode()
+
+	resp, err := http.Get(uri.String())
 	if err != nil {
 		return nil, err
 	}
